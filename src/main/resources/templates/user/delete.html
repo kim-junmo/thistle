@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+                xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+                layout:decorate="~{/layout/baseLayout}">
+
+<head>
+    <title>THISTLE</title>
+
+</head>
+<body>
+<th:block layout:fragment="content">
+<main role="main">
+
+	<div class="container">
+    <h1 class="mt-3 mb-4 text-center">THISTLE</h1>
+    <div class="row">
+        <div class="col-4">
+            <section th:replace="~{user/comm/mypage_menu}"></section>
+        </div>
+        <div class="col-8">
+            <h1>회원탈퇴</h1>
+            <form class="form-horizontal" id="deleteForm" name="deleteForm" th:action="@{/user/delete}" method="post">
+                <div class="card-body">
+
+                     <div class="form-group row">
+                         <label for="user_password" class="col-sm-6 col-form-label">현재 비밀번호</label>
+                         <div class="col-sm-6">
+                             <input type="password" class="form-control" id="user_password" name="user_password">
+                         </div>
+                     </div>
+                     
+                    
+                </div>
+
+               <button type="button" class="btn btn-info btn-block" id="btnDelete">회원탈퇴</button>
+
+            </form>
+        </div>
+    </div>
+
+  </div>
+
+</main>
+</th:block>
+  
+  <th:block layout:fragment="script">  
+  <!-- 각각의 페이지에서 필요한 자바스크립트 작성 -->
+  
+
+	  <script th:inline="javascript">
+	  
+	  let msg = [[${msg}]];
+	  if(msg == "failPW") {
+		alert("비밀번호를 확인해주세요")
+	  }
+		  
+	  
+	    //u_email, u_zip_code, u_addr, u_addrdetail, u_phone
+	      $(document).ready(function() {
+	      	
+	      	//삭제버튼 클릭 시
+				$("#btnDelete").on("click", function() {
+					
+					if($("user_password").val()== "") {
+						alert("비밀번호를 입력하세요.");
+						$("user_password").focus();
+						return;
+					}
+					// modifyForm을 서밋합니다.
+					$("#deleteForm").submit();
+	
+					});
+	
+	      }); //read event end 
+	  
+    </script>
+</th:block>
+
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en"xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+  <head th:fragment="configFragment">
+      <meta charset="UTF-8">
+      
+      <!-- 각 페이지 마다 title태그 내용이 각각 다르기 때문에 재정의 목적 -->
+      <th:block layout:fragment="title">
+        <!-- 각 페이지의 title -->
+      </th:block>
+      
+      <!-- 모든 페이지가 상속 -->
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+	  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+
+	  <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+  
+ 	  <!-- 각 페이지 마다 css 내용이 각각 다른 경우 재정의 목적 -->
+      <th:block layout:fragment="css">
+        <!-- 각 페이지의 css -->
+      </th:block>
+
+	  <!-- 각 페이지 마다 javascript 내용이 각각 다른 경우 재정의 목적 -->	
+      <th:block layout:fragment="javascript">
+        <!-- 각 페이지의 javascript -->
+      </th:block>
+
+  </head>
+</html>

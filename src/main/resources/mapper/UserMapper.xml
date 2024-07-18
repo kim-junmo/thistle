@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.docmall.basic.user.UserMapper">
+
+
+	<!-- 가입 작업 -->
+	<insert id="join" parameterType="UserVO">
+	
+	INSERT INTO
+		USER_TBL(user_id, user_password, user_name, user_email, user_zipcode, user_addr, user_deaddr, user_phone)
+	VALUES
+		(#{user_id}, #{user_password}, #{user_name}, #{user_email}, #{user_zipcode}, #{user_addr}, #{user_deaddr}, #{user_phone})
+	
+	</insert>
+
+	<!-- 가입 시 아이디 중복확인 -->
+	<select id="idCheck" parameterType="String" resultType="String">
+	
+		SELECT
+			user_id
+		FROM
+			user_tbl
+		WHERE
+			user_id = #{user_id}
+	
+	</select>
+	
+	<!-- 로그인 작업 -->
+	<select id="login" resultType="UserVO" parameterType="String">
+	
+		select 
+			user_id, user_password, user_name, user_zipcode, user_addr, user_deaddr, user_phone, user_email, user_receive, user_point,  user_lastlogin, user_datesub,user_updatedate
+		from
+			user_tbl
+		where
+			user_id = #{user_id}
+	</select>
+	
+	<!-- 아이디 찾기 -->
+	<select id="idfind" resultType="String" parameterType="map">
+	
+		SELECT
+			user_id
+		FROM
+			user_tbl
+		WHERE
+			user_name = #{user_name}
+		AND
+			user_email = #{user_email}
+	</select>
+	
+	<!-- 비밀번호 찾기 -->
+	<select id="pwfind" resultType="String" parameterType="map">
+	
+		SELECT
+			user_email
+		FROM
+			user_tbl
+		WHERE
+			user_id = #{user_id}
+		AND
+			user_name = #{user_name}
+		AND
+			user_email = #{user_email}
+		
+	</select>
+	
+	<!-- 임시 비밀번호 변경 -->
+	<update id="tempPwUpdate" parameterType="map">
+		update
+			user_tbl
+		set
+			user_password = #{temp_enc_pw}
+		where
+			user_id = #{user_id}
+	</update>
+	
+	<!-- 내정보 수정작업 -->
+	<update id="modify" parameterType="UserVO">
+	
+		update
+			user_tbl
+		set
+			user_email = #{user_email}, user_zipcode = #{user_zipcode}, user_addr = #{user_addr}, user_deaddr = #{user_deaddr}, user_phone = #{user_phone}
+		where
+			user_id = #{user_id}
+			
+	</update>
+	
+	<!-- 비밀번호 변경 작업 -->
+	
+	<update id="changepw" parameterType="map">
+	
+		update
+			user_tbl
+		set
+			user_password = #{new_user_password}
+		where
+			user_id = #{user_id}
+	</update>
+	
+	<!-- 회원탈퇴 -->
+	
+	<delete id="delete" parameterType="String">
+	
+		delete from
+			user_tbl
+		where
+			user_id = #{user_id}
+	
+	</delete>
+	
+	<select id="existUserInfo" resultType="String">
+	
+		select
+			sns_login_type
+		from
+			user_tbl
+		where
+			user_email = #{sns_email}
+		
+	</select>
+	
+	<!-- sns 카카오, 네이버 사용자 중복 체크 -->
+	<select id="sns_user_check" resultType="String" parameterType="String">
+	
+		select
+			email
+		from
+			sns_user_tbl
+		where
+			email = #{sns_email}
+	</select>
+	
+	<!-- sns 유저정보 삽입 -->
+	<insert id="sns_user_insert" parameterType="com.docmall.basic.user.SNSUserDTO">
+		insert into
+			sns_user_tbl(id, name, email, sns_type)
+		values
+			(#{id}, #{name}, #{email}, #{sns_type})
+	</insert>
+	
+	
+</mapper>

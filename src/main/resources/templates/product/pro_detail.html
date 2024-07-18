@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/baseLayout}">
+  
+   <th:block layout:fragment="css">
+        <!-- 각 페이지의 css -->
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css">
+
+		<!--별 평점 css-->
+		<style>
+			/* 별 평점 기본 선택자 */
+			p#star_re_rate a.re_rate {
+				font-size: 22px;
+				text-decoration: none;
+				color: lightgray;
+			}
+
+			/* 별 평점에 마우스 클릭 했을 경우 선택자 */
+			p#star_re_rate a.re_rate.on {
+				color: red;
+			}
+		</style>
+		
+
+        <!-- 1) Include Handlebars from a CDN 핸들바 템플릿 -->
+		<script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+
+		<!-- 핸들바 템플릿을 사용하기 위해서는 아래와 같이 접근을 해야한다. -->
+		<script id="review_template" type="text/x-handlebars-template">
+
+			<table id="revtable" class="table"> 
+			  <thead>
+			    <tr>
+		    	  <th scope="col">번호</th>
+		    	  <th scope="col">제목</th>
+		   		  <th scope="col">내용</th>
+		      	  <th scope="col">평점</th>
+				  <th scope="col">작성자</th>
+				  <th scope="col">등록일</th>
+				  <th scope="col">비고</th>
+		    	</tr>
+		  	  </thead>
+		  	  <tbody>
+				{{#each .}} <!--데이터가 복수이면 each를 사용한다.-->
+		    	<tr>
+		      	<th scope="row">{{re_code}}</th>
+		      		<td>{{re_title}}</td>
+		      		<td>{{re_content}}</td>
+		      		<td>{{displayStar re_rate}}</td>
+		      		<td>{{user_id}}</td>
+		      		<td>{{convertDate re_date}}</td>
+		      		<td>{{authControlView user_id re_code}}</td>
+		    	</tr>
+				{{/each}}
+		  	  </tbody>
+			</table>
+		</script>
+    </th:block>
+  
+  
+  <body>
+  
+
+
+<th:block layout:fragment="content">
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+  <h3 class="display-6" th:utext="${cate_name}"></h3>
+</div>
+<div class="container">
+    <div class="row">
+        	<div class="col-6">
+        		<img th:src="${'/product/image_display?dateFolderName=' + product.pro_up_folder + '&fileName=s_' + product.pro_img}">
+        	</div>
+        	<div class="col-6">
+        	<form>
+				<div class="form-group">
+					<span id="info_pro_name" th:text="${product.pro_name}">이름</span>
+					<small class="text-muted">(review : 0)</small>
+				</div>
+  				<div class="form-group">
+			    	<label for="exampleFormControlInput1">판매가격: </label><span th:text="${#numbers.formatInteger(product.pro_price, 3, 'COMMA') + '원'}"></span>
+				</div>
+			    <div class="form-group">
+					<label>수량</label>
+					<input type="number" class="form-control" value="1" id="btn_cart_amount">
+			    </div>
+			    <div class="form-group">
+					<button type="button" class="btn btn-secondary" style="width: 100%;" th:data-pro_num="${product.pro_num}" id="btn_direct_order">주문하기</button>
+					<button type="button" class="btn btn-light" style="width: 100%;" th:data-pro_num="${product.pro_num}" id="btn_cart_add">장바구니 추가</button>
+			    </div>
+			</form>
+        	
+        	</div>
+ </div>
+ 
+ <div class="row">
+  <div class="col">
+	  <div id="pro_info">
+	  <ul>
+	    <li><a href="#pro_detail">상세정보</a></li>
+	    <li><a href="#pro_review">상품리뷰(0)</a></li>
+	    <li><a href="#pro_qna">Q&A</a></li>
+	  </ul>
+	  <div id="pro_detail">
+	    <p th:utext="${product.pro_content}"></p>
+	  </div>
+	  <div id="pro_review">
+		<p><button type="button" class="btn btn-link" id="btn_review_modal">상품후기 쓰기</button></p>
+		<!--상품후기가 출력될 위치-->
+	    <div id="review_list"></div>
+		<!--페이징 출력될 위치-->
+		<div id="review_paging"></div>
+		</div>
+	  <div id="pro_qna">
+	    <p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p>
+	    <p>Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.</p>
+	  </div>
+	</div>
+ </div>
+</div>
+<!-- Button trigger modal -->
+  <!-- 상품후기 쓰기 Modal -->
+  <div class="modal fade" id="review_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h5 class="modal-title" id="exampleModalLabel">상품후기</h5>
+		  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		  </button>
+		</div>
+		<div class="modal-body">
+		  <form>
+			<div class="form-group">
+				<label for="message-text" class="col-form-label">제목</label>
+				<input type="text" class="form-control" id="re_title">
+				<input type="hidden" class="form-control" id="re_code">
+			  </div>
+			<div class="form-group">
+			  <label for="message-text" class="col-form-label">내용</label>
+			  <textarea class="form-control" id="re_content"></textarea>
+			</div>
+			<div class="form-group">
+				<label for="recipient-name" class="col-form-label">별평점</label>
+				<p id="star_re_rate">
+				  <a class="re_rate" href="#">☆</a>
+				  <a class="re_rate" href="#">☆</a>
+				  <a class="re_rate" href="#">☆</a>
+				  <a class="re_rate" href="#">☆</a>
+				  <a class="re_rate" href="#">☆</a>
+				</p>
+			  </div>
+		  </form>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+			<button type="button" id="btn_review_save" class="btn btn-primary" th:data-pro_num="${product.pro_num }" >상품후기저장</button>
+			<button type="button" id="btn_review_modify" class="btn btn-primary" th:data-pro_num="${product.pro_num }" >상품후기수정</button>
+		</div>
+		</div>
+	</div>
+   </div>
+  </div>
+</div>
+
+
+</th:block>
+
+<th:block layout:fragment="script">
+ <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.js"></script>
+<script th:inline="javascript">
+	
+	
+	$(document).ready(function() {
+		$("#pro_info").tabs();
+		
+		$("button#btn_cart_add").on("click", function() {
+
+			console.log("장바구니추가");
+
+			let pro_num = $(this).data("pro_num");
+			let cart_amount = $("#btn_cart_amount").val();
+
+			$.ajax({
+				url : '/cart/cart_add',
+				type: 'get',
+				data: {pro_num : pro_num, cart_amount : cart_amount},
+				dataType : "text",
+				success : function(result) {
+					if(result == 'success') {
+						alert("장바구니에 등록되었습니다.");
+						if(confirm("장바구니로 이동하시겠습니까?")) {
+							location.href = "/cart/cart_list";
+						}
+					}
+				}
+			});
+		});
+
+		//상품후기와 페이징정보를 호출하는 작업(자바스트 코드 작업)
+		let reviewPage = 1; //첫번째 페이지
+		//let url = "상품후기와 페이징정보를 요청하는 주소";, [[${product.pro_num}]] 타임리프 자바스크립트 사용방법.
+		//@GetMapping("/revlist/{pro_num}/{page}") 이 문법을 ajax에 호출하기 위해서 만듬.
+		let url = "/review/revlist/" + [[${product.pro_num}]] + "/" + reviewPage;
+
+		//console.log("상품후기 주소");
+
+		getReviewList(url);
+
+		//ajax문법을 통한 주소 요청 작업 $.ajax, load(), getJSON()
+		function getReviewList(url) {
+			$.getJSON(url, function(reviewlist) {
+				//console.log("reviewlist", reviewlist.revlist);
+				//console.log("reviewlist", reviewlist.pageMaker);
+				
+				//print_reviewlist(reviewlist.revlist, "상품후기 목록이 출력될 위치", "핸들바 템플릿")
+				print_reviewlist(reviewlist.revlist, $("#review_list"), $("#review_template"));
+				//print_pasing(reviewlist.pageMaker, 페이징 삽입위치);
+				print_pasing(reviewlist.pageMaker, $("#review_paging"));
+			});
+		}
+
+		//1) 상품후기 ui 작업 핸들바 템플릿을 이용
+		let print_reviewlist = function(reviewData, target, template) {
+			let templateObj = Handlebars.compile(template.html()); // 템플릿 문법 검사 및 참조
+			let reviewHtml = templateObj(reviewData);
+			target.children().remove();
+			target.append(reviewHtml);
+		}
+
+		//2) 페이징 ui 작업 : 로직으로 작업.
+		let print_pasing = function(pageData, target) {
+			let str = `<nav aria-label="Page navigation example">`;
+			str += `<ul class="pagination justify-content-center">`;
+
+			//이전 표시 유무
+			if(pageData.prev) {
+				str += `<li class="page-item">`;
+				str += `<a class="page-link" href="${pageData.startPage -1}" aria-label="Previous">`;
+				str += `<span aria-hidden="true">&laquo;</span>`;
+				str += `</a>`;
+				str += `</li>`;
+			}
+
+			//번호 표시
+			for(let i=pageData.startPage; i<pageData.endPage; i++) {
+				let className = pageData.cri.pageNum == i ? 'active' : '';
+				str += `<li class="page-item ${className}"><a class="page-link" href="${i}">${i}</a></li>`;
+			}
+
+			//다음 표시 유무
+			if(pageData.next) {
+				str += `<li class="page-item">`;
+				str += `<a class="page-link" href="${pageData.endPage +1}" aria-label="Next">`;
+				str += `<span aria-hidden="true">&raquo;</span>`;
+				str += `</a>`;
+				str += `</li>`;
+			}
+
+			target.html(str);
+		}
+
+
+		//핸들바 함수: 상품 평점 작업 handlebar template에서 사용목적, 운영체제에서 제공하는 특수문자 : 모음 + 한자 키
+		Handlebars.registerHelper("displayStar", function(rating) {
+			let star = "";
+			switch(rating) {
+				case 1:
+					star = "★☆☆☆☆";
+					break;
+				case 2:
+					star = "★★☆☆☆";
+					break;
+				case 3:
+					star = "★★★☆☆";
+					break;
+				case 4:
+					star = "★★★★☆";
+					break;
+				case 5:
+					star = "★★★★★";
+					break;
+			}
+			return star;
+		});
+
+		// 핸들바 함수: 날짜를 포맷작업. 2024/07/10
+		Handlebars.registerHelper("convertDate", function(re_date) {
+			const d = new Date(re_date);
+			let year = d.getFullYear();
+			let mouth = d.getMonth() + 1;
+			let date = d.getDate();
+			let hour = d.getHours();
+			let minute = d.getMinutes();
+
+			return `${year}.${mouth}.${date} ${hour}:${minute}`;
+
+		});
+
+		//핸들바 함수: 작성자와 로그인사용자가 일치하면 수정 및 삭제 버튼 표시
+		Handlebars.registerHelper("authControlView", function(user_id, re_code) {
+
+			//console.log("로그인", login_status);
+
+			let loginVO = /*[[${session.login_status}]]*/;
+
+			let loginId = "";
+			if(loginVO !== null) {
+				loginId = /*[[${session.login_status == null ? '' : session.login_status.user_id}]]*/;
+			}
+			//console.log(loginId);
+
+			let str = "";
+			if(loginId == user_id) {
+				str += `<button type="button" name="btn_review_edit" class="btn btn-link" data-re_code="${re_code}">수정</button>`;
+				str += `<button type="button" name="btn_review_delete" class="btn btn-link" data-re_code="${re_code}">삭제</button>`;
+			}
+			return new Handlebars.SafeString(str);
+		});
+
+
+
+
+
+		
+		// 페이징 클릭 이벤트 ${"#review_paging"}.on("click", "페이지 번호를 가리키는 태그 선택자", function() {
+		$("#review_paging").on("click", "nav ul.pagination a", function(e) {
+			e.preventDefault();
+			reviewPage = $(this).attr("href"); // 선택한 페이지 번호
+
+			url = "/review/revlist/" + [[${product.pro_num}]] + "/" + reviewPage;
+
+		getReviewList(url);
+
+		});
+
+		//상품후기 modal 작업
+		$("#btn_review_modal").on("click", function() {
+			//id="btn_review_modify"
+			$("#btn_review_save").show();
+			$("#btn_review_modify").hide();
+			$("#review_modal").modal('show');
+		});
+
+		// 별 평점을 클릭 시 효과 작업
+		$("p#star_re_rate a.re_rate").on("click", function(e) {
+			e.preventDefault();
+			$(this).parent().children().removeClass("on"); // on 선택자 제거
+			$(this).addClass("on").prevAll("a").addClass("on"); // 현재 선택한 별과 이전별까지 on 선택자 추가
+		});
+
+		// 상품 후기 저장 id="btn_review_save"
+		$("button#btn_review_save").on("click", function() {
+			let pro_num = $(this).data("pro_num");
+			//console.log(pro_num);
+			let re_title = $("#re_title").val();
+			let re_content = $("#re_content").val();
+			let re_rate = 0;
+		
+			$("p#star_re_rate a.re_rate").each(function() {
+				if($(this).attr("class") == "re_rate on") {
+					re_rate += 1;
+				}
+			});
+		
+
+		if(re_title == "") {
+			alert("제목을 입력하세요");
+			return;
+		}
+
+		if(re_content == "") {
+			alert("내용을 입력하세요");
+			return;
+		}
+
+		if(re_rate == 0) {
+			alert("평점을 선택하세요");
+			return;
+		}
+
+		//javascript object문법을 사용함.
+		let review_data = {pro_num : pro_num, re_title : re_title, re_content : re_content, re_rate : re_rate};
+
+		//ajax로 데이터를 넘기는 작업
+		$.ajax({
+			url: '/review/review_save',
+			/*
+			웹 브라우저는 데이터를 서버로 보낼 때 요청하는 방식이 get, post으로만 지원을 한다.
+			그러나 restapi 개발론에는 이 외에 get, post, put, patch, delete 등 다양하게 사용하도록 권장한다.
+			스프링 컨트롤러에서 rest api로 매핑주소가 설정이 되어 있으면,
+			아래와 같이 "X-HTTP-Method-Override" : "요청방식"으로 코드를 구성해줘야, 정상적으로 스프링 주소를 호출 가능하다.
+			rest api를 사용하지 않으면 "X-HTTP-Method-Override" : "요청방식"을 사용하지 않아도 된다.
+			*/
+			headers: {
+				"Content-Type" : "application/json", "X-HTTP-Method-Override" : "POST"
+			},
+			type: 'post',
+			data : JSON.stringify(review_data), // JSON.stringify: javascript object문법을 json으로 변환하는 작업
+			dataType : 'text',
+			success : function(result) {
+				if(result == "success") {
+					alert("상품후기가 등록되었습니다.");
+					$("#review_modal").modal('hide');
+					getReviewList(url); // 상품후기목록과 페이징 정보를 갱신.
+				}
+			}
+		});
+	});
+
+	//상품 후기 수정 작업 name="btn_review_edit"
+	$("div#review_list").on("click", "button[name='btn_review_edit']", function() {
+		let re_code = $(this).data("re_code");
+
+		$.ajax({
+			url : '/review/review_modify/' + re_code,
+			headers: {
+				"Content-Type" : "application/json", "X-HTTP-Method-Override" : "GET"
+			},
+			type: 'get',
+			dataType: 'json',
+			success: function(result) {
+				console.log(result);
+
+				//modal 내용에 상품 후기 출력작업
+				$("#re_title").val(result.re_title);
+				$("#re_content").val(result.re_content);
+				$("#re_code").val(result.re_code); //input 타입의 hidden으로 작업 되어 있음.
+
+				//$("#btn_review_save").html("상품후기 수정");
+
+				//별 상태 출력.
+				let re_rate = result.re_rate;
+					$("p#star_re_rate a.re_rate").each(function(index, item) {
+
+						if(index <= re_rate) {
+							$(this).addClass("on");
+						}
+					});
+
+				//modal 보여주기
+				$("#btn_review_save").hide();
+				$("#btn_review_modify").show();
+				$("#review_modal").modal('show');
+			}
+		});
+	});
+
+	// 상품 후기 수정
+	$("button#btn_review_modify").on("click", function() {
+		let pro_num = $(this).data("pro_num");
+		//console.log(pro_num);
+		let re_code = $("#re_code").val();
+		let re_title = $("#re_title").val();
+		let re_content = $("#re_content").val();
+		let re_rate = 0;
+	
+		$("p#star_re_rate a.re_rate").each(function() {
+			if($(this).attr("class") == "re_rate on") {
+				re_rate += 1;
+			}
+		});
+	
+
+	if(re_title == "") {
+		alert("제목을 입력하세요");
+		return;
+	}
+
+	if(re_content == "") {
+		alert("내용을 입력하세요");
+		return;
+	}
+
+	if(re_rate == 0) {
+		alert("평점을 선택하세요");
+		return;
+	}
+
+	//javascript object문법을 사용함.
+	let review_data = {pro_num : pro_num, re_title : re_title, re_content : re_content, re_rate : re_rate, re_code : re_code};
+
+	//ajax로 데이터를 넘기는 작업
+	$.ajax({
+		url: '/review/review_modify',
+		/*
+		웹 브라우저는 데이터를 서버로 보낼 때 요청하는 방식이 get, post으로만 지원을 한다.
+		그러나 restapi 개발론에는 이 외에 get, post, put, patch, delete 등 다양하게 사용하도록 권장한다.
+		스프링 컨트롤러에서 rest api로 매핑주소가 설정이 되어 있으면,
+		아래와 같이 "X-HTTP-Method-Override" : "요청방식"으로 코드를 구성해줘야, 정상적으로 스프링 주소를 호출 가능하다.
+		rest api를 사용하지 않으면 "X-HTTP-Method-Override" : "요청방식"을 사용하지 않아도 된다.
+		*/
+		headers: {
+			"Content-Type" : "application/json", "X-HTTP-Method-Override" : "PUT"
+		},
+		type: 'put',
+		data : JSON.stringify(review_data), // JSON.stringify: javascript object문법을 json으로 변환하는 작업
+		dataType : 'text',
+		success : function(result) {
+			if(result == "success") {
+				alert("상품후기가 수정되었습니다.");
+				$("#review_modal").modal('hide');
+				getReviewList(url); // 상품후기목록과 페이징 정보를 갱신.
+			}
+		}
+	});
+});
+
+
+
+
+	//상품 후기 삭제 작업 name="btn_review_delete"
+	$("div#review_list").on("click", "button[name='btn_review_delete']", function() {
+		if(!confirm("상품 후기를 삭제하시겠습니까?")) return;
+		let re_code = $(this).data("re_code");
+
+		//ajax로 데이터를 넘기는 작업
+		$.ajax({
+			url: '/review/review_delete/' + re_code,
+			/*
+			웹 브라우저는 데이터를 서버로 보낼 때 요청하는 방식이 get, post으로만 지원을 한다.
+			그러나 restapi 개발론에는 이 외에 get, post, put, patch, delete 등 다양하게 사용하도록 권장한다.
+			스프링 컨트롤러에서 rest api로 매핑주소가 설정이 되어 있으면,
+			아래와 같이 "X-HTTP-Method-Override" : "요청방식"으로 코드를 구성해줘야, 정상적으로 스프링 주소를 호출 가능하다.
+			rest api를 사용하지 않으면 "X-HTTP-Method-Override" : "요청방식"을 사용하지 않아도 된다.
+			*/
+			headers: {
+				"Content-Type" : "application/json", "X-HTTP-Method-Override" : "DELETE"
+			},
+			type: 'delete',
+			dataType : 'text',
+			success : function(result) {
+				if(result == "success") {
+					alert("상품후기가 삭제되었습니다.");
+					getReviewList(url); // 상품후기목록과 페이징 정보를 갱신.
+				}
+			}
+		});
+	});
+
+	//바로구매 id="btn_direct_order" id=#btn_cart_amount
+	$("button#btn_direct_order").on("click", function() {
+		console.log("바로구매");
+
+		let pro_num = $(this).data("pro_num");
+		let cart_amount = $("#btn_cart_amount").val();
+		let url = `/order/orderinfo?pro_num=${pro_num}&cart_amount=${cart_amount}`;
+
+		location.href = url;
+	});
+
+}); // ready event end
+
+</script>
+</th:block>
+
+
+  </body>
+</html>

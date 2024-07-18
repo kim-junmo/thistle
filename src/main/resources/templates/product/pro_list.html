@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+                xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+                layout:decorate="~{/layout/baseLayout}">
+
+<head>
+    <title>THISTLE</title>
+
+    <th:block layout:fragment="css">
+        <!-- Custom styles for this template -->
+        <link href="/css/carousel.css" rel="stylesheet">
+    </th:block>
+
+
+
+</head>
+<body>
+<th:block layout:fragment="content">
+<main role="main">
+
+    <div id="myCarousel" class="carousel slide" data-ride="carousel">
+        <ol class="carousel-indicators">
+            <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+            <li data-target="#myCarousel" data-slide-to="1"></li>
+            <li data-target="#myCarousel" data-slide-to="2"></li>
+        </ol>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <svg class="bd-placeholder-img" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label=" :  " preserveAspectRatio="xMidYMid slice" focusable="false"><title> </title><rect width="100%" height="100%" fill="#777"/><text x="50%" y="50%" fill="#777" dy=".3em"> </text></svg>
+
+                <div class="container">
+                    <div class="carousel-caption text-left">
+                        <h3 th:utext="${cate_name}"></h3>
+                        <p><a class="btn btn-lg btn-primary" href="#">Sign up today</a></p>
+                    </div>
+                </div>
+            </div>
+         </div>
+      </div>
+
+    <!-- Marketing messaging and featurettes
+    ================================================== -->
+    <!-- Wrap the rest of the page in another container to center all the content. -->
+
+    <div class="album py-5 bg-light">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4" th:each="product : ${pro_list}">
+          <div class="card mb-4 shadow-sm">
+            <a class="move" th:href="@{/product/pro_detail(pro_num = ${product.pro_num})}">
+			<!-- /*/    /*/-->
+			 <img th:src="${'/product/image_display?dateFolderName=' + product.pro_up_folder + '&fileName=s_' + product.pro_img}" width="313.6" height="313.6">
+			</a>
+            
+            <div class="card-body">
+              <p class="card-text">
+              	<span th:text="${product.pro_name}"></span><br>
+              	<span th:text="${#numbers.formatInteger(product.pro_price, 3, 'COMMA') + '원'}"></span>
+			  </p>
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="btn-group">
+                  <button type="button" class="btn btn-sm btn-outline-secondary" name="btn_direct_order" th:data-pro_num="${product.pro_num}">제품보기</button>
+                  <button type="button" class="btn btn-sm btn-outline-secondary" name="btn_cart_add" th:data-pro_num="${product.pro_num}">장바구니</button>
+                </div>
+                <small class="text-muted">(review : 0)</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<div class="row">
+	<div class="col-md-4">
+	<!--1)페이지번호 클릭할 때 사용  [이전]  1	2	3	4	5 [다음]  -->
+	<!--2)목록에서 상품이미지 또는 상품명 클릭할 때 사용   -->
+	  <form id="actionForm" action="" method="get">
+		<input type="hidden" name="pageNum" id="pageNum" th:value="${pageMaker.cri.pageNum}" />
+		<input type="hidden" name="amount"  id="amount" th:value="${pageMaker.cri.amount}" />
+		<input type="hidden" name="type" id="type" th:value="${pageMaker.cri.type}" />
+		<input type="hidden" name="keyword" id="keyword" th:value="${pageMaker.cri.keyword}" />
+    <!-- cate_code, cate_name이 actionForm에 추가 되어야 되는 이유는 productcontroller에서 두개가 추가 되어 있기 때문.-->
+    <input type="hidden" name="cate_code" id="cate_code" th:value="${cate_code}" />
+    <input type="hidden" name="cate_name" id="cate_name" th:value="${cate_name}" />
+		
+	  </form>
+	</div>
+	<div class="col-md-6 text-center">
+		<nav aria-label="...">
+		<ul class="pagination">
+			<!-- 이전 표시여부 -->
+			
+			<th:block th:if="${pageMaker.prev }">
+				<li class="page-item">
+					<a th:href="${pageMaker.startPage - 1 }" class="page-link movepage">Previous</a>
+				</li>
+			</th:block>
+			
+			<!-- https://jbground.tistory.com/40 페이지번호 출력 -->
+			<!-- 1	2	3	4	5 6	7	8	9	10  [다음] -->
+			<!-- [이전] 11	12	13	14	15 16	17	18	19	20   -->
+	
+			<th:block th:with="pageMaker = ${pageMaker}">
+				<th:block th:each="num : *{#numbers.sequence(pageMaker.startPage, pageMaker.endPage)}">
+				<li class='page-item' th:classappend="${pageMaker.cri.pageNum ==  num ? 'active': '' }" aria-current="page">
+					<a class="page-link movepage" th:href="${num }" th:text="${num }"></a>
+				</li>
+				</th:block>
+			</th:block>
+	
+			<!--  다음 표시여부 -->
+				<th:block th:if="${pageMaker.next }">
+				  <li class="page-item">
+					<a th:href="${pageMaker.endPage + 1 }" class="page-link movepage">Next</a>
+				  </li>
+				</th:block>
+				
+			</ul>
+			</nav>
+		</div>
+	</div>
+</main>
+
+<!-- Modal1 -->
+<!-- 
+<div class="modal fade" id="order_process_popup" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-6">
+            <img src="" id="info_pro_img" style="width:100%; height:255px">
+          </div>
+          <div class="col-6">
+          	<form>
+			  <div class="form-group">
+			    <span id="info_pro_name">이름</span>
+			  </div>
+        <div class="form-group">
+			    <label for="exampleFormControlInput1">판매가격: </label><span id="info_pro_price">가격</span>
+			  </div>
+			  <div class="form-group">
+			    <label>수량</label>
+			    <input type="text" class="form-control" value="1">
+			  </div>
+			  <div class="form-group">
+			    <button type="button" class="btn btn-light" name="btn_direct_order" th:data-pro_num="${product.pro_num}" style="width: 100%">바로구매</button>
+			    <button type="button" class="btn btn-light" name="btn_cart_add" th:data-pro_num="${product.pro_num}" style="width: 100%">장바구니 추가</button>
+			  </div>
+			</form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+<!-- Modal2 -->
+<div class="modal fade" id="order_process_popup_2" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel2">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <!-- load()메서드를 이용하여, pro_info_2.html파일이 실행된 내용이 삽입된다. -->
+      <div class="modal-body" id="popup_info">
+      </div>
+    </div>
+  </div>
+</div>
+
+</th:block>
+
+<th:block layout:fragment="script">
+  <script>
+    $(document).ready(function() {
+
+      //페이지 번호 클릭시 사용되는 코드
+      let actionForm = $("#actionForm");
+
+		// 페이지번호 클릭시, 이전 혹은 1, 2, 3, 4, 5 ~~ 클릭 시 동작, actionForm을 사용한다
+		$(".movepage").on("click", function(e) {
+			e.preventDefault(); //a태그의 href 기능을 제거
+			//주소 변경
+			actionForm.attr("action", "/product/pro_list"); 
+
+			//1. 클릭한 페이지번호 작업
+			actionForm.find("input[name='pageNum']").val($(this).attr("href"));
+
+
+			actionForm.submit();
+		});
+    
+    // name="btn_cart_add"
+  //   $("button[name='btn_cart_add']").on("click", function() {
+
+  //   $('#order_process_popup').modal('show');
+
+  //   let pro_num = $(this).data("pro_num");
+
+  //   console.log("상품코드", pro_num);
+
+  //   $.ajax({
+  //     url: '/product/pro_info',
+  //     type: 'get',
+  //     data: {pro_num : pro_num}, //자바스크립트 오브젯 문법
+  //     dataType: 'json',
+  //     success: function(result) {
+
+  //       //result : 사용자가 선택한 상품정보가 넘어옴
+  //       console.log("상품정보", result);
+
+  //       //modal창 요소를 접근하여 필요한 값을 대입.
+  //       //즉 db에서 상품정보를 가지고 와서 필요한 값을 대입하는 방법. 
+  //       // id="info_pro_name" 
+  //       $("span#info_pro_name").html(result.pro_name);
+  //       //id="info_pro_price"
+  //       $("span#info_pro_price").html(result.pro_price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "원");
+  //       //id="info_pro_img"
+  //       let url = `/product/image_display?dateFolderName=${result.pro_up_folder}&fileName=${result.pro_img}`;
+  //       $("img#info_pro_img").attr("src", url);
+
+  //     }
+  //   });
+
+  // });
+
+  	//model 2  name="btn_cart_add" 
+	$("button[name='btn_cart_add']").on("click", function() {
+
+	  $('#order_process_popup_2').modal('show');
+	
+	  let pro_num = $(this).data("pro_num");
+	
+	    console.log("상품코드", pro_num);
+	
+	    $("#popup_info").load("/product/pro_info_2?pro_num=" + pro_num);
+	});
+	// model 2 name="btn_direct_order" 
+	$("button[name='btn_direct_order']").on("click", function() {
+
+	  $('#order_process_popup_2').modal('show');
+	
+	  let pro_num = $(this).data("pro_num");
+	
+	    console.log("상품코드", pro_num);
+	
+	    $("#popup_info").load("/product/pro_info_2?pro_num=" + pro_num);
+	});
+	
+	
+  //바로구매 추가작업 modal2 pro_info_2.html  id="btn_direct_buy"
+  $("#order_process_popup_2").on("click", "button#btn_direct_buy", function() {
+
+		console.log("바로구매");
+
+		let pro_num = $(this).data("pro_num");
+		let cart_amount = $("#btn_cart_amount").val();
+		
+		let url = `/order/orderinfo?pro_num=${pro_num}&cart_amount=${cart_amount}`;
+
+		location.href = url;
+
+  });
+
+  //장바구니 추가작업 modal2 pro_info_2.html  id="btn_cart_add"
+  $("#order_process_popup_2").on("click", "button#btn_cart_add", function() {
+
+    let pro_num = $(this).data("pro_num");
+    let cart_amount = $("#btn_cart_amount").val();
+
+    $.ajax({
+      url: '/cart/cart_add',
+      type: 'get',
+      data: {pro_num : pro_num, cart_amount: cart_amount},
+      dataType: "text",
+      success : function(result) {
+        if(result == 'success') {
+          alert("장바구니에 등록되었습니다.");
+          if(confirm("장바구니로 이동하시겠습니까?")) {
+            location.href = "/cart/cart_list";
+          }
+          $('#order_process_popup_2').modal('hide');
+        }
+      }
+    });
+
+  });
+
+
+  }); // 이벤트 종료
+
+  </script>
+</th:block>
+
+</body>
+</html>

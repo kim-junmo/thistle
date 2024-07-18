@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.docmall.basic.admin.order.AdminOrderMapper">
+
+	<sql id="criteria">
+	    <trim prefix="(" suffix=") AND" prefixOverrides="OR">
+	        <foreach collection="typeArr" item="type">
+	            <trim prefix="OR">
+	                <choose>
+						<when test="type == 'N'.toString()">
+							ord_name like '%' || #{keyword} || '%'
+						</when>
+						<when test="type == 'C'.toString()">
+							ord_code like '%' || #{keyword} || '%'
+						</when>
+						<when test="type == 'I'.toString()">
+							user_id like '%' || #{keyword} || '%'
+	                    </when>
+	                </choose>
+	            </trim>
+	        </foreach>
+	    </trim>
+	</sql>
+
+    <select id="order_list" resultType="OrderVO" parameterType="com.docmall.basic.commom.dto.Criteria">
+    
+        SELECT 
+             ord_code, user_id, ord_name, ord_addr_zipcode, ord_addr_basic, ord_addr_detail, ord_tel, ord_price, ord_desc, ord_regdate
+        FROM (
+            SELECT /*+ INDEX_DESC(order_tbl pk_ord_code)  */ 
+                ROWNUM AS RN, ord_code, user_id, ord_name, ord_addr_zipcode, ord_addr_basic, ord_addr_detail, ord_tel, ord_price, ord_desc, ord_regdate
+            FROM
+                order_tbl
+            WHERE 
+            
+                <include refid="criteria"></include> <!-- 검색기능을 한다. -->
+                
+                <![CDATA[ 
+                	ROWNUM <= (#{pageNum} * #{amount}) 
+                ]]>  --페이지번호 * 페이지별 출력건수
+        )
+        WHERE 
+            RN > (#{pageNum} - 1 ) * #{amount}
+    </select>
+
+    <select id="getTotalCount" resultType="int" parameterType="com.docmall.basic.commom.dto.Criteria">
+    
+        SELECT
+            COUNT(*)
+        FROM
+            order_tbl
+        WHERE
+            <include refid="criteria"></include>
+            ord_code > 0
+            
+    </select>
+    
+    <select id="order_info" resultType="OrderVO" parameterType="Long">
+    
+    	SELECT
+    		ord_code, user_id, ord_name, ord_addr_zipcode, ord_addr_basic, ord_addr_detail, ord_tel, ord_price, ord_desc, ord_regdate
+    	FROM
+    		order_tbl
+    	WHERE
+    		ord_code = #{ord_code}
+    </select>
+    
+    <select id="order_detail_info" resultType="com.docmall.basic.admin.order.OrderDetailInfoVO" parameterType="Long">
+    
+	    select 
+	    	ot.ord_code, ot.pro_num, ot.dt_price, ot.dt_amount, p.pro_name, p.pro_up_folder, p.pro_img
+		FROM 
+			ordetail_tbl ot inner join product_tbl p
+		on 
+			ot.pro_num = p.pro_num
+		WHERE 
+			ot.ord_code =#{ord_code};
+    
+    </select>
+
+</mapper>

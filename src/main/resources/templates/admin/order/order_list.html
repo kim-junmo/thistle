@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<!--
+This is a starter template page. Use this page to start your new project from
+scratch. This page gets rid of all links and provides the needed markup only.
+-->
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{admin/layout/adminlayout}">
+  <head>
+    
+    
+  </head>
+  <!--
+  BODY TAG OPTIONS:
+  =================
+  Apply one or more of the following classes to get the
+  desired effect
+  |---------------------------------------------------------|
+  | SKINS         | skin-blue                               |
+  |               | skin-black                              |
+  |               | skin-purple                             |
+  |               | skin-yellow                             |
+  |               | skin-red                                |
+  |               | skin-green                              |
+  |---------------------------------------------------------|
+  |LAYOUT OPTIONS | fixed                                   |
+  |               | layout-boxed                            |
+  |               | layout-top-nav                          |
+  |               | sidebar-collapse                        |
+  |               | sidebar-mini                            |
+  |---------------------------------------------------------|
+  -->
+  <body class="hold-transition skin-blue sidebar-mini">
+    <div class="wrapper">
+
+      <!-- Main Header -->
+      
+      <!-- Left side column. contains the logo and sidebar -->
+      
+	<th:block layout:fragment="content">
+      <script src="/plugins/ckeditor/ckeditor.js"></script>
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <h1>
+            Page Header
+            <small>Optional description</small>
+          </h1>
+          <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
+            <li class="active">Here</li>
+          </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+
+          <!-- Your Page Content Here -->
+          <div class="row">
+          	<div class="col">
+          		<div class="box box-info">
+                <div class="box-header with-border">
+                  <h3 class="box-title">상품목록</h3>
+                </div><!-- /.box-header -->
+                <!-- list start -->
+                <div class="row">
+    		<div class="col-md-12">
+    			<div class="box">
+					<div class="box-header with-border">
+					<h3 class="box-title">Product List</h3>
+					</div>
+
+					<div class="box-body">
+						<div>
+							<form action="/admin/order/order_list" method="get" >
+									<select name="type">
+										<option selected th:selected="${''} == ${pageMaker.cri.type}">검색종류선택</option>
+										<option value="N" th:selected="${'N'} == ${pageMaker.cri.type}">주문자</option>
+										<option value="C" th:selected="${'C'} == ${pageMaker.cri.type}">주문번호</option>
+										<option value="I" th:selected="${'I'} == ${pageMaker.cri.type}">아이디</option>
+										
+									</select>
+									<input type="text" name="keyword" th:value="${pageMaker.cri.keyword}" />
+									<input type="hidden" name="pageNum" th:value="${pageMaker.cri.pageNum}" />
+									<input type="hidden" name="amount" th:value="${pageMaker.cri.amount}" />
+									<button type="submit" class="btn btn-primary">검색</button>
+							</form>
+						</div>
+						<table class="table table-bordered">
+							<tbody><tr>
+								<th style="width: 8%">주문코드</th>
+								<th style="width: 25%">주문자(아이디)</th>
+								<th style="width: 10%">주문가격</th>
+								<th style="width: 20%">등록일</th>
+								<th style="width: 10%">수정</th>
+								<th style="width: 10%">삭제</th>
+								<th style="width: 10%">주문상세보기</th>
+							</tr>
+							
+							<tr th:each="order : ${order_list}">
+								<td><span th:text="${order.ord_code }"></span></td>
+								<td>[[${order.ord_name}]] / [[${order.user_id}]]</td>
+								<td><span th:text="${#numbers.formatInteger(order.ord_price, 3, 'COMMA') + ' 원'}"></span></td>
+								<td th:text="${#dates.format(order.ord_regdate, 'yyyy-MM-dd HH:mm:ss') }"></td>
+								<td><button type="button" class="btn btn-primary" name="btn_order_edit" th:data-ord_code="${order.ord_code}">수정</button></td>
+								<td><button type="button" class="btn btn-danger" name="btn_order_del" th:data-ord_code="${order.ord_code}">삭제</button></td>
+								<td><button type="button" class="btn btn-danger" name="btn_order_info" th:data-ord_code="${order.ord_code}">상세보기</button></td>
+							</tr>
+							
+							
+							
+							
+							</tbody></table>
+					</div>
+					<div class="box-footer clearfix">
+						<div class="row">
+							<div class="col-md-4">
+								
+							<!--  Criteria 클래스 필드사용목적 -->
+							<!--1)페이지번호 클릭할 때 사용  [이전]  1	 2	3	4	5 [다음]  -->
+							<!--2)목록에서 상품이미지 또는 상품명 클릭할 때 사용   -->
+							  <form id="actionForm" action="" method="get">
+								<input type="hidden" name="pageNum" id="pageNum" th:value="${pageMaker.cri.pageNum}" />
+								<input type="hidden" name="amount"  id="amount" th:value="${pageMaker.cri.amount}" />
+								<input type="hidden" name="type" id="type" th:value="${pageMaker.cri.type}" />
+								<input type="hidden" name="keyword" id="keyword" th:value="${pageMaker.cri.keyword}" />
+								
+							  </form>
+							</div>
+							<div class="col-md-8 text-center">
+								<nav aria-label="...">
+								<ul class="pagination">
+									<!-- 이전 표시여부 -->
+									
+									<th:block th:if="${pageMaker.prev }">
+										<li class="page-item">
+											<a th:href="${pageMaker.startPage - 1 }" class="page-link movepage">Previous</a>
+										</li>
+									</th:block>
+									
+									<!-- https://jbground.tistory.com/40 페이지번호 출력 -->
+									<!-- 1	2	3	4	5 6	7	8	9	10  [다음] -->
+									<!-- [이전] 11	12	13	14	15 16	17	18	19	20   -->
+
+									<th:block th:with="pageMaker = ${pageMaker}">
+										<th:block th:each="num : *{#numbers.sequence(pageMaker.startPage, pageMaker.endPage)}">
+										<li class='page-item' th:classappend="${pageMaker.cri.pageNum ==  num ? 'active': '' }" aria-current="page">
+											<a class="page-link movepage" th:href="${num }" th:text="${num }"></a>
+										</li>
+										</th:block>
+									</th:block>
+
+									<!--  다음 표시여부 -->
+									<th:block th:if="${pageMaker.next }">
+									  <li class="page-item">
+										<a th:href="${pageMaker.endPage + 1 }" class="page-link movepage">Next</a>
+									  </li>
+									</th:block>
+									
+								</ul>
+								</nav>
+							</div>
+							
+						</div>
+						
+					</div>
+			   </div>
+    		</div>
+    	</div>
+              </div>
+          	</div>
+          </div>
+          
+
+        </section><!-- /.content -->
+      </div><!-- /.content-wrapper -->
+      
+    <!-- Modal -->
+	<div class="modal fade" id="order_detail_info_popup" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="staticBackdropLabel2">Modal title</h5>
+	        <button type="button" id="btn_close" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <!-- load()메서드를 이용하여, pro_info_2.html파일이 실행된 내용이 삽입된다. -->
+	      <div class="modal-body" id="popup_info">
+	        
+	      </div>
+	      
+	    </div>
+	  </div>
+	</div>
+    </th:block>
+
+      <!-- Main Footer -->
+      
+
+      <!-- Control Sidebar -->
+      
+    
+
+    <!-- REQUIRED JS SCRIPTS -->
+	<th:block layout:fragment="script">
+    <script>
+
+      $(document).ready(function() {
+        
+		let actionForm = $("#actionForm");
+
+
+		// 페이지번호 클릭시(이전  1  2	 3	4	5  다음) actionForm 을 사용한다.
+		$(".movepage").on("click", function(e) {
+			e.preventDefault(); // a태그의 href기능을 제거.
+			// 주소변경
+			actionForm.attr("action", "/admin/order/order_list");
+			//클릭한 페이지번호 작업
+			actionForm.find("input[name='pageNum']").val($(this).attr("href"));
+
+			actionForm.submit();
+		});
+
+		// 상세보기 name="btn_order_info"
+		$("button[name='btn_order_info']").on("click", function() {
+			let ord_code = $(this).data("ord_code");
+
+			// 주문상세정보.  id="order_detail_info_popup"
+			$("#order_detail_info_popup").modal('show');
+
+			$("#popup_info").load("/admin/order/order_detail_info?ord_code=" + ord_code);
+
+
+		});
+       
+        
+      }); // ready event end
+
+    </script>
+    </th:block>
+  </body>
+</html>

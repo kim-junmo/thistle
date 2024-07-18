@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<div id="category_menu" th:fragment="categoryFragment">
+        <ul class="nav justify-content-center" id="first_category">
+                <li class="nav-item">
+                        <a class="nav-link active" href="#" th:data-cate_code="'BRAND_STORY'" th:text="'BRAND STORY'"></a>
+                </li>
+                <li class="nav-item" th:each="category : ${user_cate_list}">
+                        <a class="nav-link active" href="#" th:data-cate_code="${category.cate_code }" th:text="${category.cate_name }"></a>
+                        <!-- html5에서는 태그에 의도적으로 데이터를 숨길 수 있는데 이를 date-이름이다. -->
+                </li>
+        </ul>
+</div>
+</html>

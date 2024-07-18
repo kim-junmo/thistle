@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.docmall.basic.cart.CartMapper">
+
+	<insert id="cart_add" parameterType="CartVO">
+			
+		MERGE INTO
+			cart_tbl
+		USING
+			dual
+		ON 
+			(user_id = #{user_id} AND pro_num = #{pro_num})
+		WHEN MATCHED THEN
+			UPDATE
+			SET 
+				cart_amount = cart_amount + #{cart_amount}
+		WHEN NOT MATCHED THEN
+			INSERT 
+				(cart_code, pro_num, user_id, cart_amount)
+			VALUES 
+				(seq_cart_code.NEXTVAL, #{pro_num}, #{user_id}, #{cart_amount})
+	
+	</insert>
+	
+	<select id="cart_list" resultType="CartProductVO" parameterType="String">
+	
+		SELECT 
+			c.user_id, c.cart_code, c.cart_amount, p.pro_num, p.pro_img, p.pro_up_folder, p.pro_price, p.pro_name
+		FROM 
+			cart_tbl c 
+		INNER JOIN 
+			product_tbl p
+		on 
+			c.pro_num = p.pro_num
+		where 
+			c.user_id = #{user_id}
+	
+	</select>
+	
+	<delete id="cart_del" parameterType="Long">
+	
+		delete from
+			cart_tbl
+		where
+			cart_code = #{cart_code}
+			
+	</delete>
+	
+	<update id="cart_change" parameterType="map">
+	
+		update
+			cart_tbl
+		set
+			cart_amount = #{cart_amount}
+		where
+			cart_code = #{cart_code}
+	</update>
+	
+	<delete id="cart_empty" parameterType="String">
+	
+		DELETE FROM
+			cart_tbl
+		WHERE
+			user_id = #{user_id}
+	
+	</delete>
+
+</mapper>

@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+                xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+                layout:decorate="~{/layout/baseLayout}">
+
+<head>
+    <title>THISTLE</title>
+
+    <th:block layout:fragment="css">
+        <!-- Custom styles for this template -->
+        <link href="/css/carousel.css" rel="stylesheet">
+    </th:block>
+
+
+
+</head>
+<body>
+<th:block layout:fragment="content">
+<main role="main">
+
+    <div id="myCarousel" class="carousel slide" data-ride="carousel">
+        <ol class="carousel-indicators">
+            <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+            <li data-target="#myCarousel" data-slide-to="1"></li>
+            <li data-target="#myCarousel" data-slide-to="2"></li>
+        </ol>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <svg class="bd-placeholder-img" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label=" :  " preserveAspectRatio="xMidYMid slice" focusable="false"><title> </title><rect width="100%" height="100%" fill="#777"/><text x="50%" y="50%" fill="#777" dy=".3em"> </text></svg>
+
+                <div class="container">
+                    <div class="carousel-caption text-left">
+                        <h3 th:utext="${cate_name}"></h3>
+                        <p><a class="btn btn-lg btn-primary" href="#">Sign up today</a></p>
+                    </div>
+                </div>
+            </div>
+         </div>
+      </div>
+
+    <!-- Marketing messaging and featurettes
+    ================================================== -->
+    <!-- Wrap the rest of the page in another container to center all the content. -->
+
+    <div class="album py-5 bg-light">
+    <div class="container" id="cart_info">
+     <div class="row mb-4">
+	     <div class="col-md-4">
+	      제품
+	      </div>
+	      <div class="col-md-2">
+	      수량
+	      </div>
+	      <div class="col-md-1">
+	      적립
+	      </div>
+	      <div class="col-md-2">
+	      배송비
+	      </div>
+	      <div class="col-md-2">
+	      가격
+	      </div>
+	      <div class="col-md-1">
+	      취소
+	      </div>
+     </div>
+      <div class="row mb-3 justify-content-center" th:if="${#lists.isEmpty(cart_list)}">
+	  	<p>장바구니가 비워있습니다.</p>
+	  </div>
+      <div class="row mb-3" th:if="${!#lists.isEmpty(cart_list)}" th:each="cartproduct : ${cart_list}">
+        <div class="col-md-4">
+          <a class="move" href="#">
+			<img th:src="${'/cart/image_display?dateFolderName=' + cartproduct.pro_up_folder + '&fileName=s_' + cartproduct.pro_img}" style="width: 100px; height: 120px;">
+		   </a>
+		   <span th:text="${cartproduct.pro_name}"></span>
+        </div>
+        <div class=col-md-2>
+        	<input type="number" name="cart_amount" th:value="${cartproduct.cart_amount}" class="w-50">
+        	<button type="button" class="btn btn-secondary" name="btn_cart_amount_change" th:data-cart_code="${cartproduct.cart_code}">수량변경</button>
+        </div>
+        <div class=col-md-1>
+        	0
+        </div>
+        <div class=col-md-2>
+        [기본배송] 조건
+        </div>
+        <div class=col-md-2>
+        	<span th:text="${#numbers.formatInteger(cartproduct.pro_price * cartproduct.cart_amount, 3, 'COMMA') + '원'}"></span>
+        </div>
+        <div class=col-md-1>
+        	<button type="button" class="btn btn-secondary" th:data-cart_code="${cartproduct.cart_code}" name="btn_cart_code">삭제</button>
+        </div>
+      </div>
+      
+      <div class="row mb-5">
+	  	<div class="col text-center">
+        	<button type="button" class="btn btn-secondary" id="btn_cart_empty">장바구니 비우기</button>
+        	<button type="button" class="btn btn-secondary">계속 쇼핑하기</button>
+        	<button type="button" class="btn btn-secondary" id="btn_order">주문하기</button>
+        </div>
+	   
+     </div>
+  </div>
+</main>
+
+</th:block>
+
+<th:block layout:fragment="script">
+  <script>
+    $(document).ready(function() {
+
+      //name="btn_cart_code" 장바구니 삭제
+      $("button[name='btn_cart_code']").on("click", function() {
+        if(!confirm("삭제하시겠습니까?")) return;
+        
+        location.href = "/cart/cart_del?cart_code=" + $(this).data('cart_code');
+      });
+
+      //장바구니 수량변경 name="btn_cart_amount_change"
+      $("button[name='btn_cart_amount_change']").on("click", function() {
+
+        let cart_code = $(this).data('cart_code');
+        let cart_amount = $(this).parent().find("input[name='cart_amount']").val();
+        
+        location.href = `/cart/cart_change?cart_code=${cart_code}&cart_amount=${cart_amount}`;
+      });
+      
+
+      //장바구니 비우기
+      $("button#btn_cart_empty").click(function() {
+        
+        if(!confirm("장바구니를 비우시겠습니까?")) return;
+        
+        location.href = "/cart/cart_empty";
+      });
+
+      //주문 하기 id="btn_order"
+      $("button#btn_order").on("click", function() {
+        location.href = "/order/orderinfo?type=cartorder";
+      });
+
+  }); // 이벤트 종료
+
+  </script>
+</th:block>
+
+</body>
+</html>
